@@ -2,6 +2,7 @@ package zabuton;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -29,7 +30,8 @@ public class VZN_RenderZabuton extends Render {
 		new ResourceLocation(VZN_Zabuton.DOMAIN, "textures/entity/zabuton_0.png")
 	};
 
-	public VZN_RenderZabuton() {
+	public VZN_RenderZabuton(RenderManager renderManager) {
+		super(renderManager);
 		shadowSize = 0.0F;
 		baseZabuton = new VZN_ModelZabuton();
 	}
@@ -43,7 +45,7 @@ public class VZN_RenderZabuton extends Render {
 			GL11.glPushMatrix();
 			GL11.glTranslatef((float)d, (float)d1, (float)d2);
 			GL11.glRotatef(180F - f, 0.0F, 1.0F, 0.0F);
-			
+
 			bindEntityTexture(entityzabuton);
 			GL11.glScalef(-1F, -1F, 1.0F);
 			baseZabuton.render(entityzabuton, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);

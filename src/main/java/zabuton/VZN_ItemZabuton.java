@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -48,10 +49,10 @@ public class VZN_ItemZabuton extends Item {
 				+ (entityplayer.posX - entityplayer.prevPosX) * (double) f;
 		double d1 = (entityplayer.prevPosY
 				+ (entityplayer.posY - entityplayer.prevPosY) * (double) f + 1.6200000000000001D)
-				- (double) entityplayer.yOffset;
+				- (double) entityplayer.getYOffset();
 		double d2 = entityplayer.prevPosZ
 				+ (entityplayer.posZ - entityplayer.prevPosZ) * (double) f;
-		Vec3 vec3d = Vec3.createVectorHelper(d, d1, d2);
+		Vec3 vec3d = new Vec3(d, d1, d2);
 		float f3 = MathHelper.cos(-f2 * 0.01745329F - 3.141593F);
 		float f4 = MathHelper.sin(-f2 * 0.01745329F - 3.141593F);
 		float f5 = -MathHelper.cos(-f1 * 0.01745329F);
@@ -67,16 +68,16 @@ public class VZN_ItemZabuton extends Item {
 			return itemstack;
 		}
 		if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK) {
-			int i = movingobjectposition.blockX;
-			int j = movingobjectposition.blockY;
-			int k = movingobjectposition.blockZ;
-			if (world.getBlock(i, j + 1, k).getMaterial() == Material.air) {
+			int i = movingobjectposition.getBlockPos().getX();
+			int j = movingobjectposition.getBlockPos().getY();
+			int k = movingobjectposition.getBlockPos().getZ();
+			if (world.getBlockState(new BlockPos(i, j + 1, k)).getBlock().getMaterial() == Material.air) {
 				if (!world.isRemote) {
 					VZN_EntityZabuton ez = new VZN_EntityZabuton(world,
 							(float) i + 0.5F, (float) j + 1.0F,
 							(float) k + 0.5F,
 							(byte) (itemstack.getItemDamage() & 0x0f));
-					
+
 					// 方向ぎめはここに入れる
 					ez.rotationYaw = (MathHelper.floor_double((double) ((entityplayer.rotationYaw * 4F) / 360F) + 2.50D) & 3) * 90;
 					world.spawnEntityInWorld(ez);
@@ -102,13 +103,15 @@ public class VZN_ItemZabuton extends Item {
 	@Override
 	public String getUnlocalizedName(ItemStack par1ItemStack) {
 		return (new StringBuilder()).append(super.getUnlocalizedName()).append(".")
-				.append(ItemDye.field_150923_a[par1ItemStack.getItemDamage()]).toString();
+				.append(ItemDye.dyeColors[par1ItemStack.getItemDamage()]).toString();
 	}
 
+	/*
 	@Override
 	public boolean requiresMultipleRenderPasses() {
 		return true;
 	}
+	*/
 
 	@Override
 	public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List) {
