@@ -1,4 +1,4 @@
-package zabuton;
+package net.blacklab.zabutonplus;
 
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -28,8 +28,8 @@ public class VZN_Zabuton
 	public static Item zabuton;
 	public static final String DOMAIN = "zabuton";
 	@SidedProxy(
-			clientSide = "zabuton.VZN_ProxyClient",
-			serverSide = "zabuton.VZN_ProxyCommon")
+			clientSide = "net.blacklab.zabutonplus.VZN_ProxyClient",
+			serverSide = "net.blacklab.zabutonplus.VZN_ProxyCommon")
 	public static VZN_ProxyCommon proxy;
 
 

@@ -1,4 +1,4 @@
-package zabuton;
+package net.blacklab.zabutonplus;
 
 public class VZN_ProxyCommon
 {

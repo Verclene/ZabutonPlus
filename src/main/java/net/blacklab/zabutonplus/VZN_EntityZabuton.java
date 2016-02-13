@@ -1,18 +1,10 @@
-package zabuton;
+package net.blacklab.zabutonplus;
 
-import io.netty.buffer.ByteBuf;
-
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySpider;
@@ -21,14 +13,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdditionalSpawnData {
+public class VZN_EntityZabuton extends EntityBoat {
 
 	protected double zabutonX;
 	protected double zabutonY;
@@ -43,8 +32,6 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 	public byte color;
 
 	protected int boatPosRotationIncrements;
-
-
 
 	// Method
 	public VZN_EntityZabuton(World world) {
@@ -68,12 +55,12 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 
 	public VZN_EntityZabuton(World world, double x, double y, double z, byte pColor) {
 		this(world, pColor);
-		setPositionAndRotation(x, y + getYOffset(), z, 0F, 0F);
+		setLocationAndAngles(x, y + getYOffset(), z, 0F, 0F);
 		motionX = 0.0D;
 		motionY = 0.0D;
 		motionZ = 0.0D;
 	}
-
+/*
 	@Override
 	public void setThrowableHeading(double px, double py, double pz, float f, float f1) {
 		// ディスペンサー用
@@ -95,7 +82,7 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		prevRotationPitch = rotationPitch = (float)((Math.atan2(py, f3) * 180D) / 3.1415927410125732D);
 		setDispensed(true);
 	}
-
+*/
 	@Override
 	protected boolean canTriggerWalking() {
 		return false;
@@ -103,19 +90,14 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 
 	@Override
 	protected void entityInit() {
-		dataWatcher.addObject(17, new Byte((byte)(isDispensed ? 0x01 : 0x00)));
-		dataWatcher.addObject(18, Integer.valueOf(0));
-		dataWatcher.addObject(19, new Byte((byte)0xFF));
+		super.entityInit();
+//		dataWatcher.addObject(17, new Byte((byte)(isDispensed ? 0x01 : 0x00)));
+//		dataWatcher.addObject(18, Integer.valueOf(0));
+		dataWatcher.addObject(20, new Byte((byte)0xFF));
 	}
-
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity) {
 		return par1Entity.getEntityBoundingBox();
-	}
-
-	@Override
-	public AxisAlignedBB getBoundingBox() {
-		return this.getEntityBoundingBox();
 	}
 
 	@Override
@@ -133,7 +115,7 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		nbttagcompound.setByte("Color", (byte)(color & 0x0f));
 		nbttagcompound.setShort("Health", (byte)health);
 	}
-
+/*
 	@Override
 	public void writeSpawnData(ByteBuf data) {
 		data.writeByte(color);
@@ -144,20 +126,20 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		color = data.readByte();
 		setRotation(data.readFloat(), 0.0F);
 	}
-
+*/
 	@Override
 	public double getMountedYOffset() {
 		if (riddenByEntity instanceof EntitySpider) {
-			return (double)height * 0.0D - 0.1D;
+			return -0.1D;
 		}
 		if (	riddenByEntity instanceof EntityZombie ||
 				riddenByEntity instanceof EntityEnderman) {
-			return (double)height * 0.0D - 0.4D;
+			return -0.4D;
 		}
 
-		return (double)height * 0.0D + 0.1D;
+		return 0.1D;
 	}
-
+/*
 	@Override
 	public boolean handleWaterMovement() {
 		// 独自の水没判定
@@ -168,9 +150,9 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		int var8 = MathHelper.floor_double(getEntityBoundingBox().minZ);
 		int var9 = MathHelper.floor_double(getEntityBoundingBox().maxZ + 1.0D);
 
-		/*if (!worldObj.checkChunksExist(var4, var6, var8, var5, var7, var9)) {
+		if (!worldObj.checkChunksExist(var4, var6, var8, var5, var7, var9)) {
 			return false;
-		} else {*/
+		} else {
 			boolean var10 = false;
 
 			for (int var12 = var4; var12 < var5; ++var12) {
@@ -194,7 +176,7 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 			return var10;
 		//}
 	}
-
+*/
 	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float pDammage) {
 		Entity entity = damagesource.getEntity();
@@ -226,38 +208,13 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		return !this.isDead;
 	}
 
+	/*
 	@Override
 	public void setLocationAndAngles(double px, double py, double pz, float f, float f1) {
 		this.setPosition(px, py, pz);
 		this.setRotation(f, f1);
-
-		//super.setPositionAndRotation2(px, py, pz, f, f1, i);
-//		mod_VZN_zabuton.Debug("ID:%d - %f,  %f, %f", entityId, px, py, pz);
-//		mod_VZN_zabuton.Debug("ID:%d - %f,  %f, %f", entityId, posX, posY, posZ);
-/*
-//        this.setPosition(px, py, pz);
-//        this.setRotation(f, f1);
-		this.boatPosRotationIncrements = i + 5;
-
-
-		this.zabutonX = px;
-		this.zabutonY = py;
-		this.zabutonZ = pz;
-		this.zabutonYaw = (double)f;
-		this.zabutonPitch = (double)f1;
-
-//        motionX = velocityX;
-//        motionY = velocityY;
-//        motionZ = velocityZ;
-*/
 	}
-
-	@Override
-	public void setVelocity(double d, double d1, double d2) {
-		velocityX = motionX = d;
-		velocityY = motionY = d1;
-		velocityZ = motionZ = d2;
-	}
+	*/
 
 	@Override
 	public void onUpdate(){
@@ -266,13 +223,13 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		// クライアントへはパケットで送ってたと思われる。dataWatcherに切り替え。
 		if(!this.worldObj.isRemote)
 		{
-			dataWatcher.updateObject(19, color);
+			dataWatcher.updateObject(20, color);
 		}
 		else
 		{
-			color = dataWatcher.getWatchableObjectByte(19);
+			color = dataWatcher.getWatchableObjectByte(20);
 		}
-
+/*
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
 		this.prevPosZ = this.posZ;
@@ -280,15 +237,13 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		// ボートの判定のコピー
 		// ボートは直接サーバーと位置情報を同期させているわけではなく、予測位置計算系に値を渡している。
 		// 因みにボートの座標同期間隔は結構長めなので動きが変。
-
-
 		double var6;
 		double var8;
 		double var12;
 		double var26;
 		double var24 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
 
-		if (this.worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			// Client
 			if (this.boatPosRotationIncrements > 0) {
 				var6 = this.posX + (this.zabutonX - this.posX) / (double)this.boatPosRotationIncrements;
@@ -383,6 +338,7 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 				}
 			}
 		}
+*/
 		if (this.riddenByEntity != null) {
 			if (this.riddenByEntity instanceof EntityMob) {
 				// 座ってる間は消滅させない
@@ -434,6 +390,14 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 		return true;
 	}
 
+	@Override
+	public void updateRiderPosition() {
+		if (riddenByEntity != null) {
+			riddenByEntity.setPosition(this.posX, this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ);
+		}
+	}
+
+	/*
 	// 射出判定
 	public boolean isDispensed() {
 		return dataWatcher.getWatchableObjectByte(17) > 0x00;
@@ -442,6 +406,7 @@ public class VZN_EntityZabuton extends Entity implements IProjectile, IEntityAdd
 	public void setDispensed(boolean isDispensed) {
 		dataWatcher.updateObject(17, (byte)(isDispensed ? 0x01 : 0x00));
 	}
+	*/
 
 	// クライアント側補正用
 	public int getRiddenByEntityID() {

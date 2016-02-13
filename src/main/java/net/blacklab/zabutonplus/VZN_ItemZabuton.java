@@ -1,4 +1,4 @@
-package zabuton;
+package net.blacklab.zabutonplus;
 
 import java.util.List;
 

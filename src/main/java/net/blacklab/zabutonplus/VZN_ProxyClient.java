@@ -1,4 +1,4 @@
-package zabuton;
+package net.blacklab.zabutonplus;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
