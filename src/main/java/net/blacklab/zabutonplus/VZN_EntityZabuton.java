@@ -1,9 +1,18 @@
 package net.blacklab.zabutonplus;
 
+import io.netty.buffer.ByteBuf;
+
+import java.util.Iterator;
+import java.util.List;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityMob;
@@ -13,11 +22,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class VZN_EntityZabuton extends EntityBoat {
+public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntityAdditionalSpawnData {
 
 	protected double zabutonX;
 	protected double zabutonY;
@@ -32,6 +44,8 @@ public class VZN_EntityZabuton extends EntityBoat {
 	public byte color;
 
 	protected int boatPosRotationIncrements;
+
+
 
 	// Method
 	public VZN_EntityZabuton(World world) {
@@ -55,12 +69,12 @@ public class VZN_EntityZabuton extends EntityBoat {
 
 	public VZN_EntityZabuton(World world, double x, double y, double z, byte pColor) {
 		this(world, pColor);
-		setLocationAndAngles(x, y + getYOffset(), z, 0F, 0F);
+		setPositionAndRotation(x, y + (double)getYOffset(), z, 0F, 0F);
 		motionX = 0.0D;
 		motionY = 0.0D;
 		motionZ = 0.0D;
 	}
-/*
+
 	@Override
 	public void setThrowableHeading(double px, double py, double pz, float f, float f1) {
 		// ディスペンサー用
@@ -82,7 +96,7 @@ public class VZN_EntityZabuton extends EntityBoat {
 		prevRotationPitch = rotationPitch = (float)((Math.atan2(py, f3) * 180D) / 3.1415927410125732D);
 		setDispensed(true);
 	}
-*/
+
 	@Override
 	protected boolean canTriggerWalking() {
 		return false;
@@ -90,14 +104,19 @@ public class VZN_EntityZabuton extends EntityBoat {
 
 	@Override
 	protected void entityInit() {
-		super.entityInit();
-//		dataWatcher.addObject(17, new Byte((byte)(isDispensed ? 0x01 : 0x00)));
-//		dataWatcher.addObject(18, Integer.valueOf(0));
-		dataWatcher.addObject(20, new Byte((byte)0xFF));
+		dataWatcher.addObject(17, new Byte((byte)(isDispensed ? 0x01 : 0x00)));
+		dataWatcher.addObject(18, Integer.valueOf(0));
+		dataWatcher.addObject(19, new Byte((byte)0xFF));
 	}
+
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity) {
 		return par1Entity.getEntityBoundingBox();
+	}
+
+	@Override
+	public AxisAlignedBB getBoundingBox() {
+		return getEntityBoundingBox();
 	}
 
 	@Override
@@ -115,7 +134,7 @@ public class VZN_EntityZabuton extends EntityBoat {
 		nbttagcompound.setByte("Color", (byte)(color & 0x0f));
 		nbttagcompound.setShort("Health", (byte)health);
 	}
-/*
+
 	@Override
 	public void writeSpawnData(ByteBuf data) {
 		data.writeByte(color);
@@ -126,20 +145,20 @@ public class VZN_EntityZabuton extends EntityBoat {
 		color = data.readByte();
 		setRotation(data.readFloat(), 0.0F);
 	}
-*/
+
 	@Override
 	public double getMountedYOffset() {
 		if (riddenByEntity instanceof EntitySpider) {
 			return -0.1D;
 		}
-		if (	riddenByEntity instanceof EntityZombie ||
+		if (riddenByEntity instanceof EntityZombie ||
 				riddenByEntity instanceof EntityEnderman) {
 			return -0.4D;
 		}
 
 		return 0.1D;
 	}
-/*
+
 	@Override
 	public boolean handleWaterMovement() {
 		// 独自の水没判定
@@ -150,9 +169,9 @@ public class VZN_EntityZabuton extends EntityBoat {
 		int var8 = MathHelper.floor_double(getEntityBoundingBox().minZ);
 		int var9 = MathHelper.floor_double(getEntityBoundingBox().maxZ + 1.0D);
 
-		if (!worldObj.checkChunksExist(var4, var6, var8, var5, var7, var9)) {
+		/*if (!worldObj.checkChunksExist(var4, var6, var8, var5, var7, var9)) {
 			return false;
-		} else {
+		} else */{
 			boolean var10 = false;
 
 			for (int var12 = var4; var12 < var5; ++var12) {
@@ -174,9 +193,9 @@ public class VZN_EntityZabuton extends EntityBoat {
 				}
 			}
 			return var10;
-		//}
+		}
 	}
-*/
+
 	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float pDammage) {
 		Entity entity = damagesource.getEntity();
@@ -205,115 +224,116 @@ public class VZN_EntityZabuton extends EntityBoat {
 
 	@Override
 	public boolean canBeCollidedWith() {
-		return !this.isDead;
+		return !isDead;
 	}
 
-	/*
 	@Override
-	public void setLocationAndAngles(double px, double py, double pz, float f, float f1) {
-		this.setPosition(px, py, pz);
-		this.setRotation(f, f1);
+	public void setVelocity(double d, double d1, double d2) {
+		velocityX = motionX = d;
+		velocityY = motionY = d1;
+		velocityZ = motionZ = d2;
 	}
-	*/
 
 	@Override
 	public void onUpdate(){
-		super.onUpdate();
+		super.onEntityUpdate();
 
 		// クライアントへはパケットで送ってたと思われる。dataWatcherに切り替え。
-		if(!this.worldObj.isRemote)
+		if(!worldObj.isRemote)
 		{
-			dataWatcher.updateObject(20, color);
+			dataWatcher.updateObject(19, color);
 		}
 		else
 		{
-			color = dataWatcher.getWatchableObjectByte(20);
+			color = dataWatcher.getWatchableObjectByte(19);
 		}
-/*
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
+
+		prevPosX = posX;
+		prevPosY = posY;
+		prevPosZ = posZ;
 
 		// ボートの判定のコピー
 		// ボートは直接サーバーと位置情報を同期させているわけではなく、予測位置計算系に値を渡している。
 		// 因みにボートの座標同期間隔は結構長めなので動きが変。
+
+
 		double var6;
 		double var8;
 		double var12;
 		double var26;
-		double var24 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+		double var24 = Math.sqrt(motionX * motionX + motionZ * motionZ);
 
 		if (worldObj.isRemote) {
 			// Client
-			if (this.boatPosRotationIncrements > 0) {
-				var6 = this.posX + (this.zabutonX - this.posX) / (double)this.boatPosRotationIncrements;
-				var8 = this.posY + (this.zabutonY - this.posY) / (double)this.boatPosRotationIncrements;
-				var26 = this.posZ + (this.zabutonZ - this.posZ) / (double)this.boatPosRotationIncrements;
-				var12 = MathHelper.wrapAngleTo180_double(this.zabutonYaw - (double)this.rotationYaw);
-				this.rotationYaw = (float)((double)this.rotationYaw + var12 / (double)this.boatPosRotationIncrements);
-				this.rotationPitch = (float)((double)this.rotationPitch + (this.zabutonPitch - (double)this.rotationPitch) / (double)this.boatPosRotationIncrements);
-				--this.boatPosRotationIncrements;
-				this.setPosition(var6, var8, var26);
-				this.setRotation(this.rotationYaw, this.rotationPitch);
+			if (boatPosRotationIncrements > 0) {
+				var6 = posX + (zabutonX - posX) / (double)boatPosRotationIncrements;
+				var8 = posY + (zabutonY - posY) / (double)boatPosRotationIncrements;
+				var26 = posZ + (zabutonZ - posZ) / (double)boatPosRotationIncrements;
+				var12 = MathHelper.wrapAngleTo180_double(zabutonYaw - (double)rotationYaw);
+				rotationYaw = (float)((double)rotationYaw + var12 / (double)boatPosRotationIncrements);
+				rotationPitch = (float)((double)rotationPitch + (zabutonPitch - (double)rotationPitch) / (double)boatPosRotationIncrements);
+				--boatPosRotationIncrements;
+				setPosition(var6, var8, var26);
+				setRotation(rotationYaw, rotationPitch);
 			} else {
-				motionY -= 0.08D;
-				if (this.onGround) {
-					this.motionX *= 0.5D;
-					this.motionY *= 0.5D;
-					this.motionZ *= 0.5D;
+				motionY = -0.08d;
+				if (onGround) {
+					motionX *= 0.5D;
+					motionY *= 0.5D;
+					motionZ *= 0.5D;
 					setDispensed(false);
 				}
-				this.moveEntity(this.motionX, this.motionY, this.motionZ);
+				moveEntity(motionX, motionY, motionZ);
 
-				this.motionX *= 0.9900000095367432D;
-				this.motionY *= 0.949999988079071D;
-				this.motionZ *= 0.9900000095367432D;
+				motionX *= 0.9900000095367432D;
+				motionY *= 0.949999988079071D;
+				motionZ *= 0.9900000095367432D;
 			}
 		} else {
 			// Server
 			// 落下
-			motionY -= 0.08D;
+			motionY = -0.08d;
 
 			// 搭乗者によるベクトル操作
-			if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer) {
-				this.motionX += this.riddenByEntity.motionX * 0.2D;
-				this.motionZ += this.riddenByEntity.motionZ * 0.2D;
+			if (riddenByEntity != null && riddenByEntity instanceof EntityPlayer) {
+				motionX += riddenByEntity.motionX * 0.2D;
+				motionZ += riddenByEntity.motionZ * 0.2D;
 			}
 
 			// 最高速度判定
 			Double lmaxspeed = isDispensed() ? 10.0D : 0.35D;
-			var6 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+			var6 = Math.sqrt(motionX * motionX + motionZ * motionZ);
 			if (var6 > lmaxspeed) {
 				var8 = lmaxspeed / var6;
-				this.motionX *= var8;
-				this.motionZ *= var8;
+				motionX *= var8;
+				motionZ *= var8;
 				var6 = lmaxspeed;
 			}
-			if (this.onGround) {
-				this.motionX *= 0.5D;
-				this.motionY *= 0.5D;
-				this.motionZ *= 0.5D;
+			if (onGround) {
+				motionX *= 0.5D;
+				motionY *= 0.5D;
+				motionZ *= 0.5D;
 				setDispensed(false);
 				// setVelocityの呼ばれる回数が少なくて変な動きをするので対策
-//                this.velocityChanged = true;
+//                velocityChanged = true;
 			}
-			this.moveEntity(this.motionX, this.motionY, this.motionZ);
+			moveEntity(motionX, motionY, motionZ);
 
-			this.motionX *= 0.9900000095367432D;
-			this.motionY *= 0.949999988079071D;
-			this.motionZ *= 0.9900000095367432D;
+			motionX *= 0.9900000095367432D;
+			motionY *= 0.949999988079071D;
+			motionZ *= 0.9900000095367432D;
 
 			// ヘッディング
-			this.rotationPitch = 0.0F;
-			var8 = (double)this.rotationYaw;
-			var26 = this.prevPosX - this.posX;
-			var12 = this.prevPosZ - this.posZ;
+			rotationPitch = 0.0F;
+			var8 = (double)rotationYaw;
+			var26 = prevPosX - posX;
+			var12 = prevPosZ - posZ;
 
 			if (var26 * var26 + var12 * var12 > 0.001D) {
 				var8 = (double)((float)(Math.atan2(var12, var26) * 180.0D / Math.PI));
 			}
 
-			double var14 = MathHelper.wrapAngleTo180_double(var8 - (double)this.rotationYaw);
+			double var14 = MathHelper.wrapAngleTo180_double(var8 - (double)rotationYaw);
 			if (var14 > 20.0D) {
 				var14 = 20.0D;
 			}
@@ -321,26 +341,27 @@ public class VZN_EntityZabuton extends EntityBoat {
 				var14 = -20.0D;
 			}
 
-			this.rotationYaw = (float)((double)this.rotationYaw + var14);
-			this.setRotation(this.rotationYaw, this.rotationPitch);
+			rotationYaw = (float)((double)rotationYaw + var14);
+			setRotation(rotationYaw, rotationPitch);
 
 			// 当たり判定
-			List var16 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(0.17D, 0.0D, 0.17D));
+			List var16 = worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(0.17D, 0.0D, 0.17D));
 			if (var16 != null && !var16.isEmpty()) {
 				Iterator var28 = var16.iterator();
 
 				while (var28.hasNext()) {
 					Entity var18 = (Entity)var28.next();
 
-					if (var18 != this.riddenByEntity && var18.canBePushed() && var18 instanceof VZN_EntityZabuton) {
+					if (var18 != riddenByEntity && var18.canBePushed() && var18 instanceof VZN_EntityZabuton) {
 						var18.applyEntityCollision(this);
 					}
 				}
 			}
 		}
-*/
-		if (this.riddenByEntity != null) {
-			if (this.riddenByEntity instanceof EntityMob) {
+		if (riddenByEntity != null) {
+			setRotation(riddenByEntity.rotationYaw, prevRotationPitch);
+
+			if (riddenByEntity instanceof EntityMob) {
 				// 座ってる間は消滅させない
 				setEntityLivingAge((EntityLivingBase)riddenByEntity, 0);
 			}
@@ -390,14 +411,6 @@ public class VZN_EntityZabuton extends EntityBoat {
 		return true;
 	}
 
-	@Override
-	public void updateRiderPosition() {
-		if (riddenByEntity != null) {
-			riddenByEntity.setPosition(this.posX, this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ);
-		}
-	}
-
-	/*
 	// 射出判定
 	public boolean isDispensed() {
 		return dataWatcher.getWatchableObjectByte(17) > 0x00;
@@ -406,7 +419,13 @@ public class VZN_EntityZabuton extends EntityBoat {
 	public void setDispensed(boolean isDispensed) {
 		dataWatcher.updateObject(17, (byte)(isDispensed ? 0x01 : 0x00));
 	}
-	*/
+
+	@Override
+	public void updateRiderPosition() {
+		if (riddenByEntity != null) {
+			riddenByEntity.setPosition(posX, posY + getMountedYOffset() + riddenByEntity.getYOffset(), posZ);
+		}
+	}
 
 	// クライアント側補正用
 	public int getRiddenByEntityID() {
