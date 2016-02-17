@@ -1,7 +1,8 @@
-package net.blacklab.zabutonplus;
+package net.blacklab.zabutonplus.item;
 
 import java.util.List;
 
+import net.blacklab.zabutonplus.entity.EntityZabuton;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +16,7 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-public class VZN_ItemZabuton extends Item {
+public class ItemZabuton extends Item {
 
 	public static final String colorNamesJP[] = {
 		"黒", "赤", "緑", "茶",
@@ -29,7 +30,7 @@ public class VZN_ItemZabuton extends Item {
 		0x434343, 0xd88198, 0x41cd34, 0xdecf2a,
 		0x6689d3, 0xc354cd, 0xeb8844, 0xf0f0f0 };
 
-	public VZN_ItemZabuton() {
+	public ItemZabuton() {
 		super();
 		setMaxStackSize(8);
 		setHasSubtypes(true);
@@ -73,7 +74,7 @@ public class VZN_ItemZabuton extends Item {
 			int k = movingobjectposition.getBlockPos().getZ();
 			if (world.getBlockState(new BlockPos(i, j + 1, k)).getBlock().getMaterial() == Material.air) {
 				if (!world.isRemote) {
-					VZN_EntityZabuton ez = new VZN_EntityZabuton(world,
+					EntityZabuton ez = new EntityZabuton(world,
 							(float) i + 0.5F, (float) j + 1.0F,
 							(float) k + 0.5F,
 							(byte) (itemstack.getItemDamage() & 0x0f));

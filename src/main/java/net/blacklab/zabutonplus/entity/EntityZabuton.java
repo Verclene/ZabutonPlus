@@ -1,10 +1,11 @@
-package net.blacklab.zabutonplus;
+package net.blacklab.zabutonplus.entity;
 
 import io.netty.buffer.ByteBuf;
 
 import java.util.Iterator;
 import java.util.List;
 
+import net.blacklab.zabutonplus.ZabutonPlus;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -29,7 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntityAdditionalSpawnData {
+public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdditionalSpawnData {
 
 	protected double zabutonX;
 	protected double zabutonY;
@@ -48,7 +49,7 @@ public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntit
 
 
 	// Method
-	public VZN_EntityZabuton(World world) {
+	public EntityZabuton(World world) {
 		super(world);
 		preventEntitySpawning = true;
 		setSize(0.81F, 0.2F);
@@ -58,16 +59,16 @@ public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntit
 		color = (byte)0xFF;
 	}
 
-	public VZN_EntityZabuton(World world, byte pColor) {
+	public EntityZabuton(World world, byte pColor) {
 		this(world);
 		color = pColor;
 	}
 
-	public VZN_EntityZabuton(World world, ItemStack itemstack) {
+	public EntityZabuton(World world, ItemStack itemstack) {
 		this(world, (byte)(itemstack.getItemDamage() & 0x0f));
 	}
 
-	public VZN_EntityZabuton(World world, double x, double y, double z, byte pColor) {
+	public EntityZabuton(World world, double x, double y, double z, byte pColor) {
 		this(world, pColor);
 		setPositionAndRotation(x, y + (double)getYOffset(), z, 0F, 0F);
 		motionX = 0.0D;
@@ -206,7 +207,7 @@ public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntit
 		if (entity instanceof EntityPlayer) {
 			if(color >=0 && color < 16 && !((EntityPlayer)entity).capabilities.isCreativeMode)
 			{
-				entityDropItem(new ItemStack(VZN_Zabuton.zabuton, 1, color), 0.0F);
+				entityDropItem(new ItemStack(ZabutonPlus.zabuton, 1, color), 0.0F);
 			}
 			setDead();
 		} else {
@@ -352,7 +353,7 @@ public class VZN_EntityZabuton extends EntityBoat implements IProjectile, IEntit
 				while (var28.hasNext()) {
 					Entity var18 = (Entity)var28.next();
 
-					if (var18 != riddenByEntity && var18.canBePushed() && var18 instanceof VZN_EntityZabuton) {
+					if (var18 != riddenByEntity && var18.canBePushed() && var18 instanceof EntityZabuton) {
 						var18.applyEntityCollision(this);
 					}
 				}
