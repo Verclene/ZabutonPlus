@@ -1,6 +1,5 @@
 package net.blacklab.zabutonplus.handler;
 
-import net.blacklab.zabutonplus.entity.EntityZabuton;
 import net.minecraft.dispenser.BehaviorProjectileDispense;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.IPosition;
@@ -21,6 +20,6 @@ public class BehaviorZabutonDispense extends BehaviorProjectileDispense
 
 	@Override
 	protected IProjectile getProjectileEntity(World var1, IPosition var2) {
-		return new EntityZabuton(var1, var2.getX(), var2.getY(), var2.getZ(), (byte)fitemstack.getItemDamage());
+		return null;//new EntityZabuton(var1, var2.getX(), var2.getY(), var2.getZ(), (byte)fitemstack.getItemDamage());
 	}
 }

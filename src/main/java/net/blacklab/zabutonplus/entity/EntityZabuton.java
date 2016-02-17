@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdditionalSpawnData {
+public class EntityZabuton extends EntityBoat implements IEntityAdditionalSpawnData {
 
 	protected double zabutonX;
 	protected double zabutonY;
@@ -41,12 +41,10 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 	protected double velocityY;
 	protected double velocityZ;
 	protected int health;
-	public boolean isDispensed;
+	public boolean dispensed;
 	public byte color;
 
 	protected int boatPosRotationIncrements;
-
-
 
 	// Method
 	public EntityZabuton(World world) {
@@ -55,7 +53,7 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 		setSize(0.81F, 0.2F);
 //		yOffset = 0F;
 		health = 20;
-		isDispensed = false;
+		dispensed = false;
 		color = (byte)0xFF;
 	}
 
@@ -70,32 +68,10 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 
 	public EntityZabuton(World world, double x, double y, double z, byte pColor) {
 		this(world, pColor);
-		setPositionAndRotation(x, y + (double)getYOffset(), z, 0F, 0F);
+		setPositionAndRotation(x, y + getYOffset(), z, 0F, 0F);
 		motionX = 0.0D;
 		motionY = 0.0D;
 		motionZ = 0.0D;
-	}
-
-	@Override
-	public void setThrowableHeading(double px, double py, double pz, float f, float f1) {
-		// ディスペンサー用
-		float f2 = MathHelper.sqrt_double(px * px + py * py + pz * pz);
-		px /= f2;
-		py /= f2;
-		pz /= f2;
-		px += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
-		py += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
-		pz += rand.nextGaussian() * 0.0074999998323619366D * (double)f1;
-		px *= f;
-		py *= f;
-		pz *= f;
-		motionX = px;
-		motionY = py;
-		motionZ = pz;
-		float f3 = MathHelper.sqrt_double(px * px + pz * pz);
-		prevRotationYaw = rotationYaw = (float)((Math.atan2(px, pz) * 180D) / 3.1415927410125732D);
-		prevRotationPitch = rotationPitch = (float)((Math.atan2(py, f3) * 180D) / 3.1415927410125732D);
-		setDispensed(true);
 	}
 
 	@Override
@@ -105,7 +81,7 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 
 	@Override
 	protected void entityInit() {
-		dataWatcher.addObject(17, new Byte((byte)(isDispensed ? 0x01 : 0x00)));
+		dataWatcher.addObject(17, new Byte((byte)(dispensed ? 0x01 : 0x00)));
 		dataWatcher.addObject(18, Integer.valueOf(0));
 		dataWatcher.addObject(19, new Byte((byte)0xFF));
 	}
@@ -182,9 +158,9 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 
 						if (var15 != null && var15.getMaterial() == Material.water) {
 							inWater = true;
-							double var16 = (double)((float)(var13 + 1) - BlockLiquid.getLiquidHeightPercent((Integer) worldObj.getBlockState(new BlockPos(var12, var13, var14)).getValue(BlockLiquid.LEVEL)));
+							double var16 = var13 + 1 - BlockLiquid.getLiquidHeightPercent((Integer) worldObj.getBlockState(new BlockPos(var12, var13, var14)).getValue(BlockLiquid.LEVEL));
 
-							if ((double)var7 >= var16) {
+							if (var7 >= var16) {
 								var10 = true;
 							}
 						} else {
@@ -240,15 +216,12 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 		super.onEntityUpdate();
 
 		// クライアントへはパケットで送ってたと思われる。dataWatcherに切り替え。
-		if(!worldObj.isRemote)
-		{
+		if(!worldObj.isRemote) {
 			dataWatcher.updateObject(19, color);
-		}
-		else
-		{
+		} else {
 			color = dataWatcher.getWatchableObjectByte(19);
 		}
-
+		
 		prevPosX = posX;
 		prevPosY = posY;
 		prevPosZ = posZ;
@@ -257,64 +230,58 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 		// ボートは直接サーバーと位置情報を同期させているわけではなく、予測位置計算系に値を渡している。
 		// 因みにボートの座標同期間隔は結構長めなので動きが変。
 
-
-		double var6;
-		double var8;
-		double var12;
-		double var26;
-		double var24 = Math.sqrt(motionX * motionX + motionZ * motionZ);
+		double horizontalVecSq = Math.sqrt(motionX * motionX + motionZ * motionZ);
+		
+		if (!worldObj.isRemote && isDispensed() && horizontalVecSq == 0d) {
+			setDispensed(false);
+		}
 
 		if (worldObj.isRemote) {
 			// Client
-			if (boatPosRotationIncrements > 0) {
-				var6 = posX + (zabutonX - posX) / (double)boatPosRotationIncrements;
-				var8 = posY + (zabutonY - posY) / (double)boatPosRotationIncrements;
-				var26 = posZ + (zabutonZ - posZ) / (double)boatPosRotationIncrements;
-				var12 = MathHelper.wrapAngleTo180_double(zabutonYaw - (double)rotationYaw);
-				rotationYaw = (float)((double)rotationYaw + var12 / (double)boatPosRotationIncrements);
-				rotationPitch = (float)((double)rotationPitch + (zabutonPitch - (double)rotationPitch) / (double)boatPosRotationIncrements);
+/*
+			if (boatPosRotationIncrements > 0 && !isDispensed()) {
+				correctX = posX + (zabutonX - posX) / boatPosRotationIncrements;
+				correctY = posY + (zabutonY - posY) / boatPosRotationIncrements;
+				correctZ = posZ + (zabutonZ - posZ) / boatPosRotationIncrements;
+				diffYaw = MathHelper.wrapAngleTo180_double(zabutonYaw - rotationYaw);
+				rotationYaw = (float)(rotationYaw + diffYaw / boatPosRotationIncrements);
+				rotationPitch = (float)(rotationPitch + (zabutonPitch - rotationPitch) / boatPosRotationIncrements);
 				--boatPosRotationIncrements;
-				setPosition(var6, var8, var26);
+				setPosition(correctX, correctY, correctZ);
 				setRotation(rotationYaw, rotationPitch);
 			} else {
+*/
 				motionY = -0.08d;
-				if (onGround) {
+				if (onGround && !isDispensed()) {
 					motionX *= 0.5D;
 					motionY *= 0.5D;
 					motionZ *= 0.5D;
-					setDispensed(false);
+					// setVelocityの呼ばれる回数が少なくて変な動きをするので対策
+//	                velocityChanged = true;
 				}
 				moveEntity(motionX, motionY, motionZ);
 
 				motionX *= 0.9900000095367432D;
 				motionY *= 0.949999988079071D;
 				motionZ *= 0.9900000095367432D;
-			}
+//			}
 		} else {
 			// Server
 			// 落下
 			motionY = -0.08d;
 
-			// 搭乗者によるベクトル操作
-			if (riddenByEntity != null && riddenByEntity instanceof EntityPlayer) {
-				motionX += riddenByEntity.motionX * 0.2D;
-				motionZ += riddenByEntity.motionZ * 0.2D;
-			}
-
 			// 最高速度判定
 			Double lmaxspeed = isDispensed() ? 10.0D : 0.35D;
-			var6 = Math.sqrt(motionX * motionX + motionZ * motionZ);
-			if (var6 > lmaxspeed) {
-				var8 = lmaxspeed / var6;
-				motionX *= var8;
-				motionZ *= var8;
-				var6 = lmaxspeed;
+			if (horizontalVecSq > lmaxspeed) {
+				double vectorCorrector = lmaxspeed / horizontalVecSq;
+				motionX *= vectorCorrector;
+				motionZ *= vectorCorrector;
+				horizontalVecSq = lmaxspeed;
 			}
-			if (onGround) {
+			if (onGround && !isDispensed()) {
 				motionX *= 0.5D;
 				motionY *= 0.5D;
 				motionZ *= 0.5D;
-				setDispensed(false);
 				// setVelocityの呼ばれる回数が少なくて変な動きをするので対策
 //                velocityChanged = true;
 			}
@@ -326,15 +293,14 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 
 			// ヘッディング
 			rotationPitch = 0.0F;
-			var8 = (double)rotationYaw;
-			var26 = prevPosX - posX;
-			var12 = prevPosZ - posZ;
+			double diffX = prevPosX - posX;
+			double diffZ = prevPosZ - posZ;
 
-			if (var26 * var26 + var12 * var12 > 0.001D) {
-				var8 = (double)((float)(Math.atan2(var12, var26) * 180.0D / Math.PI));
+			if (horizontalVecSq > 0.001D) {
+				horizontalVecSq = ((float)(Math.atan2(diffX, diffZ) * 180.0D / Math.PI));
 			}
 
-			double var14 = MathHelper.wrapAngleTo180_double(var8 - (double)rotationYaw);
+			double var14 = MathHelper.wrapAngleTo180_double(rotationYaw - rotationYaw);
 			if (var14 > 20.0D) {
 				var14 = 20.0D;
 			}
@@ -342,7 +308,7 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 				var14 = -20.0D;
 			}
 
-			rotationYaw = (float)((double)rotationYaw + var14);
+			rotationYaw = (float)(rotationYaw + var14);
 			setRotation(rotationYaw, rotationPitch);
 
 			// 当たり判定
@@ -360,8 +326,11 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 			}
 		}
 		if (riddenByEntity != null) {
-			setRotation(riddenByEntity.rotationYaw, prevRotationPitch);
-
+			if (riddenByEntity instanceof EntityPlayer) {
+				setRotation(riddenByEntity.prevRotationYaw, rotationPitch);
+				motionX = riddenByEntity.motionX * 0.5d;
+				motionZ = riddenByEntity.motionZ * 0.5d;
+			}
 			if (riddenByEntity instanceof EntityMob) {
 				// 座ってる間は消滅させない
 				setEntityLivingAge((EntityLivingBase)riddenByEntity, 0);
@@ -418,6 +387,7 @@ public class EntityZabuton extends EntityBoat implements IProjectile, IEntityAdd
 	}
 
 	public void setDispensed(boolean isDispensed) {
+		dispensed = isDispensed;
 		dataWatcher.updateObject(17, (byte)(isDispensed ? 0x01 : 0x00));
 	}
 
