@@ -3,6 +3,7 @@ package net.blacklab.zabutonplus.handler;
 import net.blacklab.zabutonplus.ZabutonPlus;
 import net.blacklab.zabutonplus.entity.EntityZabuton;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
@@ -31,7 +32,8 @@ public class EventHook {
 	
 	@SubscribeEvent
 	public void onEntityInteract(EntityInteractEvent event) {
-		if (event.target instanceof EntityLivingBase && event.target.ridingEntity instanceof EntityZabuton) {
+		if (event.target instanceof EntityLivingBase && !(event.target instanceof EntityPlayer) && 
+				event.target.ridingEntity instanceof EntityZabuton) {
 			ZabutonPlus.Debug("Interact Zabuton Event %s", event.target.ridingEntity);
 			event.target.ridingEntity.attackEntityFrom(DamageSource.generic, 20f);
 		}
