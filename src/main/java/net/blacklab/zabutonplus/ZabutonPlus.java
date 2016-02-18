@@ -28,17 +28,18 @@ import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(	modid = ZabutonPlus.DOMAIN,
 		name  = ZabutonPlus.NAME,
-		version = ZabutonPlus.VERSION)
+		version = ZabutonPlus.VERSION,
+		acceptedMinecraftVersions = "[1.8,1.8.9]")
 public class ZabutonPlus
 {
 //	@MLProp
-	public static boolean isDebugMessage = true;
+	public static boolean isDebugMessage = false;
 
 	public static Item zabuton;
 	public static final String DOMAIN = "zabutonplus";
 	
 	public static final String NAME = "ZabutonPlus";
-	public static final String VERSION = "1.0.6";
+	public static final String VERSION = "1.0.7";
 	
 	public static final VersionData currentVersion = new VersionData(1, VERSION, VERSION);
 	public static VersionData latestVersion = new VersionData(1, "1.0.1", "1.0.1");

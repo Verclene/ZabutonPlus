@@ -6,6 +6,7 @@ import net.blacklab.zabutonplus.entity.EntityZabuton;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
@@ -104,7 +105,7 @@ public class ItemZabuton extends Item {
 	@Override
 	public String getUnlocalizedName(ItemStack par1ItemStack) {
 		return (new StringBuilder()).append(super.getUnlocalizedName()).append(".")
-				.append(ItemDye.dyeColors[par1ItemStack.getItemDamage()]).toString();
+				.append(EnumDyeColor.byDyeDamage(par1ItemStack.getItemDamage())).toString();
 	}
 
 	/*
