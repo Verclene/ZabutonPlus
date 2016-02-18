@@ -6,9 +6,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 
 public class EventHook {
@@ -31,11 +33,12 @@ public class EventHook {
 	}
 	
 	@SubscribeEvent
-	public void onEntityInteract(EntityInteractEvent event) {
+	public void onEntityInteract(AttackEntityEvent event) {
 		if (event.target instanceof EntityLivingBase && !(event.target instanceof EntityPlayer) && 
 				event.target.ridingEntity instanceof EntityZabuton) {
 			ZabutonPlus.Debug("Interact Zabuton Event %s", event.target.ridingEntity);
 			event.target.ridingEntity.attackEntityFrom(DamageSource.generic, 20f);
+			event.setCanceled(true);
 		}
 	}
 
