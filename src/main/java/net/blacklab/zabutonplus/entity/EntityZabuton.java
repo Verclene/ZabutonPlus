@@ -373,10 +373,16 @@ public class EntityZabuton extends EntityBoat implements IEntityAdditionalSpawnD
 	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		// ラーイド・オン！
-		if (riddenByEntity != null && (riddenByEntity instanceof EntityPlayer) && riddenByEntity != entityplayer) {
+		ZabutonPlus.Debug("INTERACT");
+		if (riddenByEntity instanceof EntityPlayer && riddenByEntity != entityplayer) {
 			return true;
 		}
 		if (!worldObj.isRemote) {
+			if (riddenByEntity instanceof EntityLivingBase) {
+				riddenByEntity.mountEntity(null);
+				setRiddenByEntityID(riddenByEntity);
+				return true;
+			}
 			entityplayer.mountEntity(this);
 		}
 		return true;

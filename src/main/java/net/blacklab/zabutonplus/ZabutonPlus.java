@@ -15,6 +15,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -39,7 +40,7 @@ public class ZabutonPlus
 	public static final String DOMAIN = "zabutonplus";
 	
 	public static final String NAME = "ZabutonPlus";
-	public static final String VERSION = "1.0.7";
+	public static final String VERSION = "1.0.8";
 	
 	public static final VersionData currentVersion = new VersionData(1, VERSION, VERSION);
 	public static VersionData latestVersion = new VersionData(1, "1.0.1", "1.0.1");
@@ -74,6 +75,7 @@ public class ZabutonPlus
 		
 		latestVersion = Version.getLatestVersion("http://mc.el-blacklab.net/versions.cgi?id=net.blacklab.zabutonplus", 5);
 		FMLCommonHandler.instance().bus().register(new EventHook());
+		MinecraftForge.EVENT_BUS.register(new EventHook());
 	}
 
 	@EventHandler	// 1.6.2
