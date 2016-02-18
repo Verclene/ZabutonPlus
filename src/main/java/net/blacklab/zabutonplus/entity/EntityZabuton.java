@@ -378,11 +378,6 @@ public class EntityZabuton extends EntityBoat implements IEntityAdditionalSpawnD
 			return true;
 		}
 		if (!worldObj.isRemote) {
-			if (riddenByEntity instanceof EntityLivingBase) {
-				riddenByEntity.mountEntity(null);
-				setRiddenByEntityID(riddenByEntity);
-				return true;
-			}
 			entityplayer.mountEntity(this);
 		}
 		return true;
