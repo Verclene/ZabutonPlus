@@ -328,8 +328,9 @@ public class EntityZabuton extends EntityBoat implements IEntityAdditionalSpawnD
 		if (riddenByEntity != null) {
 			if (riddenByEntity instanceof EntityPlayer) {
 				setRotation(riddenByEntity.prevRotationYaw, rotationPitch);
-				motionX = riddenByEntity.motionX * 0.5d;
-				motionZ = riddenByEntity.motionZ * 0.5d;
+				posX += riddenByEntity.motionX * 0.5d;
+				posZ += riddenByEntity.motionZ * 0.5d;
+				setPosition(posX, posY, posZ);
 			}
 			if (riddenByEntity instanceof EntityMob) {
 				// 座ってる間は消滅させない
